@@ -34,8 +34,19 @@ var cache = new Cache('/tmp/exhentai');
 
 http.createServer(function(request, response) {
   
-  var fileid = request.url.split('fileid=')[1].split(';')[0];
-  
+  var fileid;
+  try {
+     fileid = request.url.split('fileid=')[1].split(';')[0];
+  } catch (e) {
+    if (e instanceof TypeError) {
+      response.writeHead(404, {});
+      response.write("Resource not found.");
+      response.end();
+      return;
+    }
+    else throw e;
+  }
+      
   console.log("open:  ", fileid);
   deferred(cache.getFile(fileid)).then(function(file_rec) {
 
